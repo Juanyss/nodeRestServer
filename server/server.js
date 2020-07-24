@@ -1,48 +1,31 @@
 require('./config/config')
 
-const express = require('express')
-const app = express()
+const express = require('express');
+const mongoose = require('mongoose');
+const colors = require('colors');
 
-const bodyParser = require('body-parser')
-    // parse application/x-www-form-urlencoded
+const app = express();
+
+const bodyParser = require('body-parser');
+
+
+// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/usuario', function(req, res) {
-    res.json('getUsuario')
-});
 
-app.post('/usuario', function(req, res) {
 
-    let body = req.body;
+app.use(require('./routes/usuario'));
 
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'Falta el nombre'
-        });
-    } else {
-        res.json({
-            persona: body
-        })
-    }
 
-});
 
-app.put('/usuario/:id', function(req, res) {
-
-    let id = req.params.id;
-    res.json({
-        id
-    })
-});
-
-app.delete('/usuario', function(req, res) {
-    res.json('deleteUsuario')
+mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
+    if (err) throw colors.red(err);
+    console.log(colors.green('Base de datos online'));
 });
 
 app.listen(process.env.PORT, () => {
-    console.log('Escuchando el puerto: ', process.env.PORT);
+    console.log(colors.green('Escuchando el puerto: ', process.env.PORT));
 })
