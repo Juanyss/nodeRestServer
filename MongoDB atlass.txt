@@ -1,0 +1,5 @@
+user: juanyss88
+pass: 440036Cu
+
+MongoDB atlas URL:
+mongodb+srv://juanyss88:440036Cu@firstclustertest.4c9g4.mongodb.net/test

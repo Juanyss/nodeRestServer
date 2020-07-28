@@ -21,7 +21,7 @@ app.use(require('./routes/usuario'));
 
 
 
-mongoose.connect('mongodb://localhost:27017/cafe', (err, res) => {
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true }, (err, res) => {
     if (err) throw colors.red(err);
     console.log(colors.green('Base de datos online'));
 });
