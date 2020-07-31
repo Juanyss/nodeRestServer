@@ -21,4 +21,14 @@ if (process.env.NODE_ENV === 'dev') {
     urlDB = process.env.MONGO_URI;
 }
 
+//====================
+//Expires in
+//====================
+process.env.EXPIRES_IN = 60 * 60 * 24 * 30;
+//====================
+//Autenthication seed
+//====================
+
+process.env.SEED = process.env.SEED || 'juanyss88';
+
 process.env.URLDB = urlDB;
