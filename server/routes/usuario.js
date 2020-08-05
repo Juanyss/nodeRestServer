@@ -5,7 +5,6 @@ const _ = require('underscore');
 const Usuario = require('../models/usuario');
 const { checkToken, checkRol } = require('../middlewares/auth')
 
-const { response } = require('express');
 const app = express();
 
 app.get('/usuario', checkToken, (req, res) => {
@@ -30,7 +29,7 @@ app.get('/usuario', checkToken, (req, res) => {
                 });
             }
 
-            Usuario.count({ estado: true }, (err, total) => {
+            Usuario.countDocuments({ estado: true }, (err, total) => {
                 res.json({
                     ok: true,
                     usersTotal: total,
