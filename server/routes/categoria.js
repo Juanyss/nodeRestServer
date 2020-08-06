@@ -30,28 +30,32 @@ app.get('/categoria', checkToken, (req, res) => {
 //Show 1 category by ID
 app.get('/categoria/:id', checkToken, (req, res) => {
 
-    let id = mongoose.Types.ObjectId(req.params.id);
-    console.log(id);
-    // Categoria.findById(id, (err, categoria) => {
-    //     if (err) {
-    //         return res.status(500).json({
-    //             ok: false,
-    //             err
-    //         });
-    //     }
+    let id = req.params.id;
 
-    //     if (!categoria) {
-    //         return res.status(500).json({
-    //             ok: false,
-    //             error: 'Categoria no encontrada'
-    //         });
-    //     }
+    Categoria.findById(id, (err, categoria) => {
+        if (err) {
+            if (err.kind === "ObjectId") {
+                return res.status(404).json({
+                    errors: [{
+                        ok: false,
+                        error: 'Categoria not found'
+                    }, ],
+                });
+            }
 
-    //     res.json({
-    //         ok: true,
-    //         usuario: categoria,
-    //     })
-    // })
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+
+
+        res.json({
+            ok: true,
+            usuario: categoria,
+        })
+    })
 })
 
 //Create new category
@@ -74,14 +78,31 @@ app.post('/categoria', [checkToken, checkRol], (req, res) => {
 
         res.json({
             ok: true,
-            usuario: categoriaNueva
+            categoria: categoriaNueva
         })
     })
 })
 
 
 //Update a category
+app.put('/categoria/:id', [checkToken, checkRol], (req, res) => {
+    let id = req.params.id;
+    let body = req.body;
 
+    Categoria.findOneAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }), (err, categoriaUpdated) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        return res.json({
+            ok: true,
+            categoria: categoriaUpdated
+        })
+    }
+})
 
 //Delete a category
 
