@@ -23,17 +23,6 @@ let checkToken = (req, res, next) => {
 let checkRol = (req, res, next) => {
     let usuario = req.usuario;
 
-
-
-    // if (err) {
-    //     return res.status(401).json({
-    //         ok: false,
-    //         err
-    //     })
-    // }
-
-    console.log(usuario.rol);
-
     if (usuario.rol != 'ADMIN_ROL') {
         return res.status(403).json({
             ok: false,

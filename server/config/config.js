@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'dev') {
 //====================
 //Expires in
 //====================
-process.env.EXPIRES_IN = 60 * 60 * 24 * 30;
+process.env.EXPIRES_IN = '48h';
 
 
 //====================

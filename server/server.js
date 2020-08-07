@@ -27,6 +27,7 @@ app.use(require('./routes/index'));
 
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true }, (err, res) => {
+    console.log(process.env.URLDB);
     if (err) throw colors.red(err);
     console.log(colors.green('Base de datos online'));
 });
