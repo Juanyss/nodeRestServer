@@ -2,7 +2,7 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const app = express();
 
-app.use(fileUpload({ useTempFiles: true }));
+app.use(fileUpload());
 
 const Usuario = require('../models/usuario');
 const Producto = require('../models/producto');
