@@ -34,10 +34,14 @@ app.get('/categoria/:id', checkToken, (req, res) => {
 
     Categoria.findById(id, (err, categoria) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+            return res.status(500).json({ ok: false, err });
+        }
+
+        if (!categoria) {
+            return res.status(404).json({ ok: false, err: 'Category not found' });
         }
 
         res.json({
@@ -81,10 +85,14 @@ app.put('/categoria/:id', [checkToken, checkRol], (req, res) => {
     Categoria.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }, (err, categoriaUpdated) => {
 
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+            return res.status(500).json({ ok: false, err });
+        }
+
+        if (!categoria) {
+            return res.status(404).json({ ok: false, err: 'Category not found' });
         }
 
 
@@ -102,10 +110,14 @@ app.delete('/categoria/:id', [checkToken, checkRol], (req, res) => {
 
     Categoria.findByIdAndUpdate(id, { estado: false }, { new: true }, (err, categoryDeleted) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+            return res.status(500).json({ ok: false, err });
+        }
+
+        if (!categoryDeleted) {
+            return res.status(404).json({ ok: false, err: 'Category not found' });
         }
 
         res.json({

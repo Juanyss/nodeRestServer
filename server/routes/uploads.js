@@ -5,6 +5,10 @@ const app = express();
 app.use(fileUpload({ useTempFiles: true }));
 
 const Usuario = require('../models/usuario');
+const Producto = require('../models/producto');
+
+const fs = require('fs');
+const path = require('path');
 
 app.put('/upload/:tipo/:id', (req, res) => {
     let tipo = req.params.tipo;
@@ -30,8 +34,6 @@ app.put('/upload/:tipo/:id', (req, res) => {
     }
 
 
-
-
     let archivo = req.files.archivo;
     let nombreArchivo = archivo.name.split('.');
     let extension = nombreArchivo[nombreArchivo.length - 1];
@@ -47,38 +49,102 @@ app.put('/upload/:tipo/:id', (req, res) => {
             error: `Extension ${extension} not allowed`,
             extensionsAllowed: extensionesPermitidas.join(', ')
         })
-    } else {
-        archivo.mv(`uploads/${tipo}/${nuevoNombre}`, (err) => {
-            if (err) {
-                return res.status(500).json({ ok: false, err });
-            }
-
-            imagenUsuario(id, res, nuevoNombre);
-
-        });
     }
+
+
+    if (tipo === 'usuarios') {
+        saveUser(id, archivo, nuevoNombre, tipo, res);
+    } else if (tipo === 'productos') {
+        saveProduct(id, archivo, nuevoNombre, tipo, res);
+    }
+
 
 })
 
-function imagenUsuario(id, res, nuevoNombre) {
+
+
+
+function deleteImage(imageName, type) {
+    //Path to delete old image
+    let pathImagen = path.resolve(__dirname, `../../uploads/${type}/${imageName}`)
+    if (fs.existsSync(pathImagen)) {
+        fs.unlinkSync(pathImagen);
+    }
+}
+
+function saveUser(id, archivo, nuevoNombre, tipo, res) {
+
     Usuario.findById(id, (err, usuarioDB) => {
         if (err) {
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
             return res.status(500).json({ ok: false, err });
         }
-        usuarioDB.imagenUsuario = nuevoNombre;
+
+        if (!usuarioDB) {
+            return res.status(404).json({ ok: false, err: 'User not found' });
+        }
+
+        //Path to delete old image
+        deleteImage(usuarioDB.img, tipo);
+        usuarioDB.img = nuevoNombre;
 
         usuarioDB.save((err, usuarioSave) => {
             if (err) {
                 return res.status(500).json({ ok: false, err });
             }
 
-            res.json({
-                ok: true,
-                usuarioSave,
-                img: nuevoNombre
-            })
-        })
+            archivo.mv(`uploads/${tipo}/${nuevoNombre}`, (err) => {
+                if (err) {
+                    return res.status(500).json({ ok: false, err });
+                }
 
+                res.json({
+                    ok: true,
+                    usuarioSave,
+                    img: nuevoNombre
+                })
+            });
+        })
+    })
+}
+
+function saveProduct(id, archivo, nuevoNombre, tipo, res) {
+
+    Producto.findById(id, (err, productoDB) => {
+        if (err) {
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+            return res.status(500).json({ ok: false, err });
+        }
+
+        if (!productoDB) {
+            return res.status(404).json({ ok: false, err: 'Product not found' });
+        }
+
+        //Path to delete old image
+        deleteImage(productoDB.img, tipo);
+        productoDB.img = nuevoNombre;
+
+        productoDB.save((err, productoSave) => {
+            if (err) {
+                return res.status(500).json({ ok: false, err });
+            }
+
+            archivo.mv(`uploads/${tipo}/${nuevoNombre}`, (err) => {
+                if (err) {
+                    return res.status(500).json({ ok: false, err });
+                }
+
+                res.json({
+                    ok: true,
+                    productoSave,
+                    img: nuevoNombre
+                })
+            });
+        })
     })
 }
 

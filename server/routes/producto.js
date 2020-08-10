@@ -51,6 +51,10 @@ app.get('/productos/:id', checkToken, (req, res) => {
         .populate('categoria', 'descripcion')
         .exec((err, producto) => {
             if (err) {
+                if (err.kind === "ObjectId") {
+                    return res.status(400).json({ ok: false, err: 'Id not valid' });
+                }
+
                 return res.status(400).json({
                     ok: false,
                     err
@@ -138,9 +142,20 @@ app.put('/productos/:id', checkToken, (req, res) => {
     Producto.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' },
         (err, productoUpdated) => {
             if (err) {
-                return res.status(500).json({
+                if (err.kind === "ObjectId") {
+                    return res.status(400).json({ ok: false, err: 'Id not valid' });
+                }
+
+                return res.status(400).json({
                     ok: false,
                     err
+                });
+            }
+
+            if (!productoUpdated) {
+                return res.status(404).json({
+                    ok: false,
+                    err: 'Product not found'
                 });
             }
 
@@ -161,9 +176,20 @@ app.delete('/productos/:id', checkToken, (req, res) => {
     Producto.findByIdAndUpdate(id, { disponible: false }, { new: true, runValidators: true, context: 'query' },
         (err, productoUpdated) => {
             if (err) {
-                return res.status(500).json({
+                if (err.kind === "ObjectId") {
+                    return res.status(400).json({ ok: false, err: 'Id not valid' });
+                }
+
+                return res.status(400).json({
                     ok: false,
                     err
+                });
+            }
+
+            if (!productoUpdated) {
+                return res.status(404).json({
+                    ok: false,
+                    err: 'Product not found'
                 });
             }
 

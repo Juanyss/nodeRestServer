@@ -76,9 +76,20 @@ app.put('/usuario/:id', [checkToken, checkRol], (req, res) => {
 
     Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }, (err, usuarioDB) => {
         if (err) {
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+
             return res.status(400).json({
                 ok: false,
                 err
+            });
+        }
+
+        if (!usuarioDB) {
+            return res.status(404).json({
+                ok: false,
+                err: 'User not found'
             });
         }
 
@@ -96,6 +107,10 @@ app.delete('/usuario/:id', [checkToken, checkRol], (req, res) => {
 
     Usuario.findByIdAndUpdate(id, newEstado, { new: true }, (err, usuarioBorrado) => {
         if (err) {
+            if (err.kind === "ObjectId") {
+                return res.status(400).json({ ok: false, err: 'Id not valid' });
+            }
+
             return res.status(400).json({
                 ok: false,
                 err
@@ -103,9 +118,9 @@ app.delete('/usuario/:id', [checkToken, checkRol], (req, res) => {
         }
 
         if (!usuarioBorrado) {
-            return res.status(400).json({
+            return res.status(404).json({
                 ok: false,
-                error: 'Usuario no encontrado'
+                err: 'User not found'
             });
         }
 
